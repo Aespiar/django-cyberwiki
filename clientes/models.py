@@ -6,7 +6,13 @@ from simple_history.utils import update_change_reason
 class Cliente(models.Model):
     nombre_cliente = models.CharField(max_length=100)
     informacion_general = models.TextField()
-    logo = models.ImageField(upload_to='logos/', null=True, blank=True)  # Campo para el logo de cada cliente
+    logo = models.ImageField(upload_to='logos/', default='logos/default_logo.jpg', null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Si el logo es una cadena vacía o None, asignar el valor predeterminado
+        if not self.logo or self.logo == '':
+            self.logo = 'logos/default_logo.jpg'
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nombre_cliente

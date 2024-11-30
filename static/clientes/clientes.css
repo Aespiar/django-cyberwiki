@@ -171,3 +171,31 @@ h2, h3 {
     transform: scale(1.05); /* Pequeño zoom al pasar el ratón */
     box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
 }
+.modal-title {
+    font-family: 'Playfair Display', serif;
+    color: #0056b3;
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+}
+
+.form-label {
+    font-weight: bold;
+    color: #495057;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}

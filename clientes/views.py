@@ -1,28 +1,77 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from PIL import Image
 from .models import Cliente, ControlActivo,SeccionCliente, TablaCliente, FilaTabla
 from django.contrib import messages
 from simple_history.utils import update_change_reason
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from .forms import SeccionClienteForm, ExcelUploadForm
+from django.templatetags.static import static
 import pandas as pd
-import json
+import json,os
 from io import BytesIO
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
 from .utils import procesar_archivo_y_guardar
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
 # Vista para listar clientes
 def lista_clientes(request):
     clientes = Cliente.objects.all()
+    for cliente in clientes:
+        # Si el logo es vacío o None, usar el valor predeterminado
+        if not cliente.logo or cliente.logo == '':
+            cliente.logo = 'logos/default_logo.jpg'
     return render(request, 'clientes/clientes.html', {'clientes': clientes})
+
 
 # Vista para el detalle de cada cliente
 def detalle_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, pk=cliente_id)
     return render(request, 'clientes/detalle_cliente.html', {'cliente': cliente})
+
+# Vista para agregar un cliente
+def agregar_cliente(request):
+    if request.method == 'POST':
+        nombre_cliente = request.POST['nombre_cliente']
+        informacion_general = request.POST['informacion_general']
+        logo = request.FILES.get('logo', None)
+        Cliente.objects.create(nombre_cliente=nombre_cliente, informacion_general=informacion_general, logo=logo)
+        return redirect('lista_clientes')
+    return render(request, 'clientes/agregar_cliente.html')
+
+@receiver(pre_save, sender=Cliente)
+def convertir_logo(sender, instance, **kwargs):
+    if instance.logo:
+        filepath = instance.logo.path
+        if filepath.endswith('.jfif'):
+            img = Image.open(filepath)
+            rgb_im = img.convert('RGB')
+            new_filepath = filepath.replace('.jfif', '.jpg')
+            rgb_im.save(new_filepath, format='JPEG')
+            os.remove(filepath)  # Elimina el archivo original
+            instance.logo.name = instance.logo.name.replace('.jfif', '.jpg')
+
+# Vista para editar un cliente
+def editar_cliente(request, cliente_id):
+    cliente = get_object_or_404(Cliente, pk=cliente_id)
+    if request.method == 'POST':
+        cliente.nombre_cliente = request.POST['nombre_cliente']
+        cliente.informacion_general = request.POST['informacion_general']
+        if 'logo' in request.FILES:
+            cliente.logo = request.FILES['logo']
+        cliente.save()
+        return redirect('lista_clientes')
+    return render(request, 'clientes/editar_cliente.html', {'cliente': cliente})
+
+# Vista para eliminar un cliente
+def eliminar_cliente(request, cliente_id):
+    cliente = get_object_or_404(Cliente, pk=cliente_id)
+    cliente.delete()
+    return redirect('lista_clientes')
 
 # Vista para el control de activos
 def control_activos(request):
