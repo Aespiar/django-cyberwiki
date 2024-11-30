@@ -64,7 +64,7 @@ def editar_cliente(request, cliente_id):
         if 'logo' in request.FILES:
             cliente.logo = request.FILES['logo']
         cliente.save()
-        return redirect('lista_clientes')
+        return redirect('lista_clientes')  # Redirige a la lista de clientes
     return render(request, 'clientes/editar_cliente.html', {'cliente': cliente})
 
 # Vista para eliminar un cliente
