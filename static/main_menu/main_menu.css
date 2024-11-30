@@ -1,0 +1,202 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #003366;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.navbar nav a {
+    margin: 0 15px;
+    color: white;
+    text-decoration: none;
+    font-size: 1em;
+}
+
+.navbar .user-info {
+    font-size: 1em;
+}
+
+.navbar .user-info a.logout {
+    color: #FF0000;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* Main Section */
+main {
+    padding: 20px;
+}
+
+/* Turnos Container */
+.turnos-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Tarjeta de Personal */
+.turno-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    padding: 15px;
+    text-align: center;
+    position: relative;
+}
+
+.turno-card img.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.turno-card h3 {
+    font-size: 1.2em;
+    margin: 0;
+}
+
+.turno-card .turno,
+.turno-card .rol {
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+
+/* Actions in Turno-Card */
+.turno-card .actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.turno-card .btn {
+    font-size: 0.9em;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    margin: 5px;
+}
+
+.turno-card .btn.edit-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.turno-card .btn.delete-btn {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+/* Agregar Personal Button */
+.add-btn {
+    display: block;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1em;
+    text-align: center;
+    margin: 20px auto;
+    width: fit-content;
+    transition: background-color 0.3s ease;
+}
+
+.add-btn:hover {
+    background-color: #218838;
+}
+
+/* Form Section */
+.form-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    margin: 0 auto;
+}
+
+.form-container label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-container input[type="text"],
+.form-container input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.form-container .btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1em;
+}
+
+.form-container .btn.save-btn {
+    background-color: #007bff;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.form-container .btn.cancel-btn {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+/* Leyenda */
+.leyenda {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
+    max-width: 600px;
+}
+
+.leyenda h4 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #003366;
+}
+
+.leyenda p {
+    font-size: 0.9em;
+    margin: 5px 0;
+    line-height: 1.5;
+    text-align: justify;
+}

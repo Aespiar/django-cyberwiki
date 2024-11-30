@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Principal</title>
+    <link rel="stylesheet" href="{% static 'main_menu/main_menu.css' %}">
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <a href="{% url 'main_menu' %}" class="logo">Cyber WIKI</a>
+            <nav>
+                <a href="{% url 'lista_clientes' %}">Información Clientes</a>
+                <a href="{% url 'detalle_cliente' 2 %}">Información Cyberline</a>
+                <a href="{% url 'control_activos' %}">Control de Activos</a>
+            </nav>
+            <div class="user-info">
+                <span class="welcome-text">Bienvenido, {{ request.user.first_name }}</span>
+                <a href="{% url 'logout' %}" class="logout">Cerrar sesión</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="turnos-container">
+            {% for personal in personales %}
+            <div class="turno-card">
+                <img src="{{ personal.imagen.url }}" alt="Avatar" class="avatar">
+                <h3>{{ personal.nombre }}</h3>
+                <p class="turno">{{ personal.turno }}</p>
+                <p class="rol">Rol: {{ personal.rol }}</p>
+                {% if editable %}
+                <div class="actions">
+                    <div>
+                    <a href="{% url 'editar_personal' personal.id %}" class="btn edit-btn">Editar</a>
+                    </div>
+                    <form action="{% url 'eliminar_personal' personal.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn delete-btn" onclick="return confirm('¿Estás seguro de eliminar este registro?')">Eliminar</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+        <a href="{% url 'agregar_personal' %}" class="btn add-btn">Agregar Personal</a>
+
+        <div class="leyenda">
+            <h4>Leyenda</h4>
+            <p><strong>Roles</strong>: Alertas y Primera Atención, CyberSOC, Seguimiento, Completo</p>
+            <p><strong>Turnos</strong>: Mañana (07am - 03pm) / (08am - 05pm) / (09am - 06pm), Tarde (3pm - 11pm), Matutino (11pm - 07am)</p>
+        </div>
+    </main>
+</body>
+</html>

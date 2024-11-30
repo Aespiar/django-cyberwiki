@@ -1,0 +1,10 @@
+<table>
+    {% for row in data %}
+    <tr>
+        {% for cell in row %}
+        <td><input type="text" name="cell_{{ forloop.counter }}" value="{{ cell }}"></td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+<button type="submit">Guardar Cambios</button>

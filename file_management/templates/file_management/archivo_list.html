@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Archivos</title>
+</head>
+<body>
+    <h2>Lista de Archivos</h2>
+    <ul>
+        {% for archivo in archivos %}
+            <li>
+                <a href="{{ archivo.archivo.url }}" target="_blank">{{ archivo.nombre }}</a>
+                (Subido el {{ archivo.fecha_subida }})
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'upload_file' %}">Subir un nuevo archivo</a>
+</body>
+</html>

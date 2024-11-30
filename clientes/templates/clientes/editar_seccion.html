@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Sección - {{ cliente.nombre_cliente }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'clientes/detalle_cliente.css' %}">
+</head>
+<body>
+    <header>
+        <a href="{% url 'detalle_cliente' cliente.id %}">Volver</a>
+    </header>
+    <main class="detalle-container">
+        <h1>Editar Sección</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-success">Guardar Cambios</button>
+        </form>
+    </main>
+</body>
+</html>

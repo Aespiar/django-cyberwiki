@@ -1,0 +1,173 @@
+/* Barra de navegación */
+.navbar {
+    background: linear-gradient(90deg, #002f6c, #0057b8);
+    padding: 1.2rem 2rem;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+body, h2, h3, p, a {
+    font-family: 'Playfair Display', serif;
+}
+
+.navbar .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+}
+
+h2, h3 {
+    font-family: 'Roboto Slab', serif;
+    font-weight: bold;
+}
+
+.navbar .logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+    text-decoration: none;
+}
+
+.navbar nav a {
+    color: rgb(252, 247, 247);
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.navbar nav a:hover {
+    color: #50cbe0;
+}
+
+/* Usuario y Dropdown */
+.user-info {
+    position: relative;
+    font-size: 0.9rem;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: transparent;
+    padding: 8px 12px;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 5px;
+}
+
+.user-info:hover {
+    background-color: #003f8a;
+}
+
+.user-info:hover .dropdown-content {
+    display: block;
+    pointer-events: auto;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #003f8a;
+    min-width: 150px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    transition: visibility 0.3s ease, opacity 0.3s ease; /* Añade una transición */
+    pointer-events: none; /* Evita clics cuando está oculto */
+}
+
+.user-info:hover .dropdown-content {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto; /* Permite clics cuando está visible */
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: block;
+    border-bottom: 1px solid #002f6c;
+}
+
+.dropdown-content a:hover {
+    background-color: #002f6c;
+}
+
+.user-info:hover .dropdown-content {
+    display: block;
+}
+
+/* Contenedor de clientes */
+.clientes-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    background-color: #f4f4f9;
+}
+
+/* Tarjetas de clientes */
+.cliente-card {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+.cliente-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Logo del cliente */
+.cliente-logo {
+    max-width: 100px;
+    max-height: 100px;
+    margin-right: 20px;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+}
+
+/* Información de cliente */
+.cliente-info h2 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #064b79;
+    margin: 0 0 10px;
+}
+
+.cliente-info p {
+    margin: 0;
+}
+
+.procesos-link {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #0057b8;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.procesos-link:hover {
+    background-color: #003f8a;
+    transform: scale(1.05); /* Pequeño zoom al pasar el ratón */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+}

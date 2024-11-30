@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<div class="page-container">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Sección</title>
+    <link rel="stylesheet" href="{% static 'clientes/detalle_seccion.css' %}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Encabezado -->
+    <header>
+        <nav class="navbar navbar-expand-lg custom-navbar">
+            <a href="{% url 'main_menu' %}" class="navbar-brand custom-logo">CyberWiki</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'lista_clientes' %}">Información Clientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'detalle_cliente' 2 %}">Información Cyberline</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'control_activos' %}">Control de Activos</a>
+                    </li>
+                </ul>
+                <div class="user-info">
+                    <span class="welcome-text">Bienvenido, {{ request.user.first_name }}</span>
+                    <div class="dropdown-content">
+                        <a href="{% url 'logout' %}">Cerrar sesión</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Sección de archivo -->
+    <section class="file-section">
+        <div class="file-header">
+            <h3><i class="fas fa-folder"></i> Archivo Plantilla</h3>
+            {% if cliente.logo %}
+            <img src="{{ cliente.logo.url }}" alt="Logo del cliente" class="client-logo">
+            {% else %}
+            <p>No hay logo disponible para este cliente.</p>
+            {% endif %}
+        </div>
+        <div class="file-buttons">
+            {% if seccion.archivo %}
+                <a href="{{ seccion.archivo.url }}" class="btn btn-success">Descargar Archivo</a>
+                <form method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" name="eliminar_archivo" class="btn btn-danger">Eliminar Archivo</button>
+                </form>
+            {% else %}
+                <p>No hay archivo asociado a esta sección.</p>
+            {% endif %}
+            <form method="POST" enctype="multipart/form-data" class="file-upload">
+                {% csrf_token %}
+                <label for="archivo" class="btn btn-primary">Seleccionar Archivo</label>
+                <input type="file" name="archivo" id="archivo">
+                <button type="submit" class="btn btn-primary">Subir</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Sección de tabla -->
+    <section>
+        <h3>Enlaces de {{ cliente.nombre_cliente }}</h3>
+        {% if tabla and tabla.filas.exists %}
+        <div class="table-container">
+            <table id="data-table" class="styled-table" data-tabla-id="{{ tabla.id }}">
+                <!-- Encabezados -->
+                <thead>
+                    <tr>
+                        {% for key in tabla.filas.first.datos.keys %}
+                        <th class="styled-header">{{ key }}</th>
+                        {% endfor %}
+                        {% if request.user.rol == 'Supervisor' %}
+                        <th class="styled-header">Acciones</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <!-- Cuerpo -->
+                <tbody>
+                    {% for fila in tabla.filas.all %}
+                    <tr data-id="{{ fila.id }}">
+                        {% for key, value in fila.datos.items %}
+                        <td {% if key == 'Columna_combinada'%} rowspan="2" {%endif%} class="data-cell" data-key="{{ key }}" >
+                            {{ value }}</td>
+                        {% endfor %}
+                        {% if request.user.rol == 'Supervisor' %}
+                        <td><button class="btn-delete" data-id="{{ fila.id }}">🗑️</button></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No hay datos disponibles para mostrar. Se generó una tabla por defecto para esta sección.</p>
+        {% endif %}
+        
+        <!-- Acciones del Supervisor -->
+        {% if request.user.rol == 'Supervisor' %}
+        <div class="supervisor-actions">
+            <button id="add-row" class="btn btn-success">➕ Añadir</button>
+            <button id="toggle-edit" class="btn btn-warning">✏️ Edición</button>
+            <button id="guardar-tabla" data-url="{% url 'guardar_tabla' %}" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+        {% endif %}
+        
+        <!-- Botones de Exportación -->
+        <div class="export-buttons">
+            {% if tabla and tabla.id %}
+            <form method="GET" action="{% url 'exportar_excel' tabla.id %}">
+                <button type="submit" class="btn btn-success">Exportar a Excel</button>
+            </form>
+            <form method="GET" action="{% url 'exportar_pdf' tabla.id %}">
+                <button type="submit" class="btn btn-danger">Exportar a PDF</button>
+            </form>
+            {% else %}
+            <p>No hay tabla disponible para exportar.</p>
+            {% endif %}
+        </div>
+    </section>
+    <!-- Scripts -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
+</div>
+</section>
+</main>
+</body>
+
+</html>

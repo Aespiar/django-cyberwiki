@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Personal</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main_menu/main_menu.css' %}">
+</head>
+<body>
+    <h1>Editar Personal</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" value="{{ personal.nombre }}" required>
+
+        <label for="turno">Turno:</label>
+        <input type="text" id="turno" name="turno" value="{{ personal.turno }}" required>
+
+        <label for="rol">Rol:</label>
+        <input type="text" id="rol" name="rol" value="{{ personal.rol }}" required>
+
+        <label for="imagen">Imagen:</label>
+        <input type="file" id="imagen" name="imagen">
+
+        <button type="submit">Guardar</button>
+        <a href="{% url 'main_menu' %}">Cancelar</a>
+    </form>
+</body>
+</html>

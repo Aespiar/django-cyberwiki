@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <title>Información de Clientes - Cyber WIKI</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'clientes/clientes.css' %}">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="navbar">
+            <a href="{% url 'main_menu' %}" class="logo">Cyber WIKI</a>
+            <nav>
+                <a href="{% url 'lista_clientes' %}">Información Clientes</a>
+                <a href="{% url 'detalle_cliente' 2 %}">Información Cyberline</a>
+                <a href="{% url 'control_activos' %}">Control de Activos</a>
+            </nav>
+            <div class="user-info">
+                <span class="welcome-text">Bienvenido, {{ request.user.first_name }}</span>
+                <div class="dropdown-content">
+                    <a href="{% url 'logout' %}">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main>
+        <div class="clientes-container">
+            {% for cliente in clientes %}
+            <div class="cliente-card">
+                <img src="{{ cliente.logo.url }}" alt="Logo de {{ cliente.nombre_cliente }}" class="cliente-logo">
+                <div class="cliente-info">
+                    <h2>{{ cliente.nombre_cliente }}</h2>
+                    <p>
+                        <a href="{% url 'detalle_cliente' cliente.id %}" class="procesos-link">Información y Procesos</a>
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

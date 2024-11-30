@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Activos</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'clientes/control_activo.css' %}">
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <a href="{% url 'main_menu' %}" class="logo">Cyber WIKI</a>
+            <nav>
+                <a href="{% url 'lista_clientes' %}">Información Clientes</a>
+                <a href="{% url 'detalle_cliente' 2 %}">Información Cyberline</a>
+                <a href="{% url 'control_activos' %}">Control de Activos</a>
+            </nav>
+            <div class="user-info">
+                <span class="welcome-text">Bienvenido, {{ request.user.first_name }}</span>
+                <div class="dropdown-content">
+                    <a href="{% url 'logout' %}">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <header>
+            <h2>Control de Activos</h2>
+            <div class="cliente-actions">
+                <!-- Filtro por cliente -->
+                <form method="GET" action="{% url 'control_activos' %}">
+                    <label for="cliente-select">Seleccionar Cliente:</label>
+                    <select name="cliente_id" id="cliente-select" onchange="this.form.submit()">
+                        <option value="">Todos los Clientes</option>
+                        {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}" {% if cliente.id|stringformat:"s" == cliente_id %}selected{% endif %}>
+                            {{ cliente.nombre_cliente }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <button class="add-btn">Agregar</button>
+                <button class="delete-btn">Eliminar</button>
+            </div>
+        </header>
+
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>N°</th>
+                        <th>Ubicación</th>
+                        <th>IP</th>
+                        <th>Nombre</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Tipo de HW</th>
+                        <th>Número de Serie</th>
+                        <th>Requiere Upgrade</th>
+                        <th>Requiere Mantenimiento</th>
+                        <th>N° de Mantenimientos</th>
+                        <th>Modelo Vigente</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    {% for activo in activos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ activo.ubicacion }}</td>
+                        <td>{{ activo.ip }}</td>
+                        <td>{{ activo.nombre_activo }}</td>
+                        <td>{{ activo.marca }}</td>
+                        <td>{{ activo.modelo }}</td>
+                        <td>{{ activo.tipo_hw }}</td>
+                        <td>{{ activo.numero_serie }}</td>
+                        <td>{{ activo.requiere_upgrade }}</td>
+                        <td>{{ activo.requiere_mantenimiento }}</td>
+                        <td>{{ activo.numero_mantenimientos }}</td>
+                        <td>{{ activo.modelo_vigente }}</td>
+                        <td>{{ activo.descripcion }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Formulario para cargar Excel -->
+        <div class="file-upload">
+            <form method="POST" enctype="multipart/form-data" action="{% url 'cargar_excel' %}">
+                {% csrf_token %}
+                <label for="cliente-id">Seleccionar Cliente:</label>
+                <select name="cliente_id" id="cliente-id" required>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}">{{ cliente.nombre_cliente }}</option>
+                    {% endfor %}
+                </select>
+                <input type="file" name="archivo_excel" accept=".xlsx" required>
+                <button type="submit" class="btn btn-success">Cargar Excel</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.getElementById("client-filter").addEventListener("change", function () {
+            const clientId = this.value;
+            fetch(`/clientes/filtrar-activos/?cliente_id=${clientId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById("table-body");
+                    tableBody.innerHTML = "";
+                    data.forEach((activo, index) => {
+                        const row = `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${activo.ubicacion || ""}</td>
+                                <td>${activo.ip || ""}</td>
+                                <td>${activo.nombre_activo || ""}</td>
+                                <td>${activo.marca || ""}</td>
+                                <td>${activo.modelo || ""}</td>
+                                <td>${activo.tipo_hw || ""}</td>
+                                <td>${activo.numero_serie || ""}</td>
+                                <td>${activo.requiere_upgrade || ""}</td>
+                                <td>${activo.requiere_mantenimiento || ""}</td>
+                                <td>${activo.numero_mantenimientos || ""}</td>
+                                <td>${activo.modelo_vigente || ""}</td>
+                                <td>${activo.descripcion || ""}</td>
+                            </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error("Error al cargar los datos:", error));
+        });
+    </script>
+</body>
+</html>

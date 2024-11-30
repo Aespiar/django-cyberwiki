@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de {{ seccion.titulo }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'clientes/historial_seccion.css' %}">
+</head>
+
+<body>
+    <header class="navbar">
+        <a href="{% url 'detalle_cliente' cliente.id %}" class="btn btn-secondary">← Volver</a>
+        <h1>Historial de la Sección: {{ seccion.titulo }}</h1>
+    </header>
+
+    <main>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo de Cambio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in historial %}
+                <tr>
+                    <td>{{ item.history_date|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% if item.history_type == '+' %}
+                            Creación
+                        {% elif item.history_type == '~' %}
+                            Modificación
+                        {% elif item.history_type == '-' %}
+                            Eliminación
+                        {% endif %}
+                        {% if item.history_change_reason %}
+                            - {{ item.history_change_reason }}
+                        {% else %}
+                            - Sin motivo registrado
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if es_supervisor %}
+                            <a href="{% url 'restaurar_seccion' cliente.id seccion.id item.id %}" class="btn btn-warning btn-sm">
+                                Restaurar
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+
+</html>

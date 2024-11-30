@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %} <!--Se tiene precargado la carpeta static para los estilos-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber WIKI - Iniciar Sesión</title>
+    <link rel="stylesheet" href="{% static 'login/login.css' %}"> <!-- Referencia al estilo propuesto -->
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>Cyber WIKI</h2>
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %} <!--Se tiene activado el Token CSRF, debido a que Django utiliza este token para proteger 
+                tus formularios contra ataques de falsificación de solicitudes-->
+                <!-- Campo de Usuario -->
+                <div class="input-container">
+                    <i class="icon-user"></i>
+                    <input type="text" name="username" placeholder="usuario" required>
+                </div>
+                <!-- Campo de contraseña -->
+                <div class="input-container">
+                    <i class="icon-lock"></i>
+                    <input type="password" name="password" placeholder="*********" required>
+                </div>
+                <!-- Botón de envío -->
+                <button type="submit">Iniciar sesión</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

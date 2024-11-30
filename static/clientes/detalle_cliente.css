@@ -1,0 +1,189 @@
+/* Barra de navegación */
+.navbar {
+    background: linear-gradient(90deg, #002f6c, #0057b8);
+    padding: 1.2rem 2rem;
+    margin: 9px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center !important;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo de fuente general */
+body, h2, h3, p, a {
+    font-family: 'Playfair Display', serif;
+}
+
+.navbar .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    padding: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+    text-decoration: none;
+}
+
+.navbar nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.navbar nav a:hover {
+    color: #50cbe0;
+}
+
+/* Dropdown del usuario */
+.user-info {
+    position: relative;
+    font-size: 0.9rem;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+.user-info:hover .dropdown-content {
+    display: block;
+    pointer-events: auto;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #003f8a;
+    min-width: 150px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    transition: visibility 0.3s ease, opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: block;
+    border-bottom: 1px solid #002f6c;
+}
+
+.dropdown-content a:hover {
+    background-color: #002f6c;
+}
+
+/* Contenedor principal */
+.detalle-container {
+    max-width: 950px; /* Más ancho para un diseño centrado */
+    margin: 30px auto;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    overflow: hidden;
+}
+
+/* Header del cliente */
+.detalle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.detalle-logo {
+    width: 120px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.detalle-titulo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #0057b8;
+}
+
+/* Secciones del cliente */
+.info-secciones ul.list-group {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-secciones .list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.info-secciones .list-group-item:hover {
+    background-color: #f0f8ff;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.info-secciones .btn {
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Botones */
+button {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón Editar */
+.btn-warning {
+    background-color: #0057b8; /* Azul similar al diseño */
+    border-radius: 25px;
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #003f8a;
+}
+
+/* Botón Agregar */
+.btn-success {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background-color: #0057b8; /* Azul similar al diseño */
+    color: white;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: normal;
+    margin-top: 20px;
+}
+
+.btn-success:hover {
+    background-color: #003f8a;
+}
