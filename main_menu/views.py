@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import Personal
 
@@ -72,18 +72,17 @@ def agregar_personal(request):
 @login_required
 def editar_personal(request, personal_id):
     personal = get_object_or_404(Personal, id=personal_id)
-
-    if request.method == 'POST' and request.user.rol == 'Supervisor':
+    if request.method == 'POST':
         personal.nombre = request.POST.get('nombre', personal.nombre)
         personal.turno = request.POST.get('turno', personal.turno)
         personal.rol = request.POST.get('rol', personal.rol)
+
         if 'imagen' in request.FILES:
             personal.imagen = request.FILES['imagen']
         personal.save()
-        return redirect('main_menu')
-    
-    return render(request, 'main_menu/editar_personal.html', {'personal': personal})
-
+        
+        return JsonResponse({'status': 'success'})  # Respuesta JSON para el fetch
+    return JsonResponse({'status': 'error'}, status=400)
 
 @login_required
 def eliminar_personal(request, personal_id):
