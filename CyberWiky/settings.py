@@ -90,9 +90,32 @@ WSGI_APPLICATION = 'CyberWiky.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'railway',  # Nombre de tu base de datos
+        'USER': 'root',  # Usuario
+        'PASSWORD': 'EYBLCGmVMpGUhQjmOveUwyPhSRXNBapY',  # Contraseña
+        'HOST': 'junction.proxy.rlwy.net',  # Host público
+        'PORT': '59611',  # Puerto público
+    }
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -134,7 +157,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 PLANTILLAS_INTERNAS = os.path.join(BASE_DIR, 'media/plantillas_internas')
 
 #Definir la carpeta estática
