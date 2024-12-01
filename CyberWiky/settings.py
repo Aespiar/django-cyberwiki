@@ -88,16 +88,12 @@ WSGI_APPLICATION = 'CyberWiky.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',
-        'NAME': 'CICyberwiki',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'railway',
         'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',  # O usa el nombre del servidor si no es localhost
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-            'extra_params': 'Trusted_Connection=yes;',
-        }
+        'PASSWORD': 'toKyNppGhuzAYKGRGeocyFXEUowCPitW',
+        'HOST': 'mysql.railway.internal',  # O usa el nombre del servidor si no es localhost
+        'PORT': '3306',
     }
 }
 
