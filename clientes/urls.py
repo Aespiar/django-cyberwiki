@@ -13,6 +13,10 @@ urlpatterns = [
     path('control_activos/', views.control_activos, name='control_activos'),
     path('cargar_excel/', views.cargar_excel, name='cargar_excel'),
     path('filtrar_activos/', views.filtrar_activos, name='filtrar_activos'),
+    path('control_activos/eliminar/<int:activo_id>/', views.eliminar_activo, name='eliminar_activo'),
+    path("control_activos/agregar/", views.agregar_activo, name="agregar_activo"),
+    path('control_activos/editar/<int:activo_id>/', views.editar_activo, name='editar_activo'),
+    path('procesar_archivo_control_activo/', views.procesar_archivo_control_activo, name='procesar_archivo_control_activo'),
 
     # Secciones del cliente
     path('<int:cliente_id>/agregar_seccion/', views.agregar_seccion, name='agregar_seccion'),

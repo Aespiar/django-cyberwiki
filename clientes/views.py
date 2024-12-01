@@ -4,6 +4,7 @@ from .models import Cliente, ControlActivo,SeccionCliente, TablaCliente, FilaTab
 from django.contrib import messages
 from simple_history.utils import update_change_reason
 from django.conf import settings
+from rapidfuzz import process, fuzz
 from django.http import JsonResponse, HttpResponse
 from .forms import SeccionClienteForm, ExcelUploadForm
 from django.templatetags.static import static
@@ -12,7 +13,7 @@ import json,os,tempfile
 from io import BytesIO
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
-from .utils import procesar_archivo_y_guardar
+from .utils import procesar_archivo_y_guardar, procesar_archivo
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.views.decorators.csrf import csrf_exempt
@@ -61,29 +62,25 @@ def editar_cliente(request, cliente_id):
         return redirect('lista_clientes')
     return render(request, 'clientes/editar_cliente.html', {'cliente': cliente})
 
-# Vista para eliminar un cliente
-def eliminar_cliente(request, cliente_id):
-    cliente = get_object_or_404(Cliente, pk=cliente_id)
-    cliente.delete()
-    return redirect('lista_clientes')
-
-# Vista para el control de activos
+# Vista para listar los activos
 def control_activos(request):
     cliente_id = request.GET.get("cliente_id", None)
     clientes = Cliente.objects.all()  # Lista de clientes para el dropdown
 
-    # Filtra los activos según el cliente seleccionado
     if cliente_id:
         activos = ControlActivo.objects.filter(cliente_id=cliente_id)
     else:
         activos = ControlActivo.objects.all()
 
+    print(f"Activos encontrados: {activos.count()}")
     return render(request, 'clientes/control_activo.html', {
         'activos': activos,
         'clientes': clientes,
-        'cliente_id': cliente_id,  # Esto mantiene la selección en el dropdown
+        'cliente_id': cliente_id,
     })
 
+# Cargar archivo Excel para actualizar activos
+@login_required
 def cargar_excel(request):
     if request.method == "POST":
         cliente_id = request.POST.get("cliente_id")
@@ -94,64 +91,236 @@ def cargar_excel(request):
             return redirect("control_activos")
 
         try:
-            # Verifica que el cliente existe
+            # Guardar temporalmente el archivo para procesarlo
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as temp_file:
+                for chunk in archivo_excel.chunks():
+                    temp_file.write(chunk)
+                temp_file_path = temp_file.name
+
+            # Procesar archivo
+            datos_procesados = procesar_archivo(temp_file_path)
+
+            # Registrar los datos en la base de datos
             cliente = Cliente.objects.get(id=cliente_id)
-
-            df = pd.read_excel(request.FILES['archivo_excel'])
-
-            # Renombrar columnas si es necesario
-            df = df.rename(columns={
-                'Ubicación': 'ubicacion',
-                'IP': 'ip',
-                'Nombre': 'nombre_activo',
-                'Marca': 'marca',
-                'Modelo': 'modelo',
-                'Tipo de HW': 'tipo_hw',
-                'Número de Serie': 'numero_serie',
-                'Requiere Upgrade': 'requiere_upgrade',
-                'Requiere Mantenimiento': 'requiere_mantenimiento',
-                'N° de Mantenimientos': 'numero_mantenimientos',
-                'Modelo Vigente': 'modelo_vigente',
-                'Descripción': 'descripcion',
-            })
-
-            # Validar y cargar cada registro
-            for _, row in df.iterrows():
+            for fila in datos_procesados:
                 ControlActivo.objects.create(
-                    cliente=Cliente.objects.get(id=request.POST['cliente_id']),
-                    nombre_activo=row['nombre_activo'],
-                    ubicacion=row['ubicacion'],
-                    ip=row['ip'],
-                    marca=row['marca'],
-                    modelo=row['modelo'],
-                    tipo_hw=row['tipo_hw'],
-                    numero_serie=row['numero_serie'],
-                    requiere_upgrade=row['requiere_upgrade'],
-                    requiere_mantenimiento=row['requiere_mantenimiento'],
-                    numero_mantenimientos=row['numero_mantenimientos'],
-                    modelo_vigente=row['modelo_vigente'],
-                    descripcion=row['descripcion'],
+                    cliente=cliente,
+                    nombre_activo=fila.get('nombre_activo'),
+                    ubicacion=fila.get('ubicacion'),
+                    ip=fila.get('ip'),
+                    marca=fila.get('marca'),
+                    modelo=fila.get('modelo'),
+                    tipo_hw=fila.get('tipo_hw'),
+                    numero_serie=fila.get('numero_serie'),
+                    requiere_upgrade=fila.get('requiere_upgrade'),
+                    requiere_mantenimiento=fila.get('requiere_mantenimiento'),
+                    numero_mantenimientos=fila.get('numero_mantenimientos'),
+                    modelo_vigente=fila.get('modelo_vigente'),
+                    descripcion=fila.get('descripcion'),
                 )
 
-            messages.success(request, "Archivo Excel cargado correctamente.")
-            return redirect("control_activos")
+            os.remove(temp_file_path)  # Eliminar archivo temporal
+            messages.success(request, "Archivo Excel procesado y datos registrados correctamente.")
         except Exception as e:
-            messages.error(request, f"Error al procesar el archivo: {e}")
-            return redirect("control_activos")
-        
+            print(f"Error al procesar el archivo: {e}")
+            messages.error(request, "Hubo un problema al procesar el archivo.")
+        finally:
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)  # Asegurarse de eliminar el archivo temporal
+
+        return redirect("control_activos")
+
+def descomponer_celdas_combinadas(df):
+    """
+    Rellena las celdas vacías con el último valor no vacío en cada columna.
+    Esto asegura que los datos combinados en Excel se propaguen correctamente.
+    """
+    for column in df.columns:
+        df[column] = df[column].fillna(method="ffill")  # Rellenar hacia adelante
+    return df
+
+@login_required
+@csrf_exempt
+def procesar_archivo_control_activo(request):
+    if request.method == "POST":
+        cliente_id = request.POST.get("cliente_id")
+        archivo_excel = request.FILES.get("archivo_excel")
+
+        if not cliente_id or not archivo_excel:
+            return JsonResponse({"success": False, "message": "Cliente o archivo no proporcionado."})
+
+        try:
+            # Guardar el archivo temporalmente
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as temp_file:
+                for chunk in archivo_excel.chunks():
+                    temp_file.write(chunk)
+                temp_file_path = temp_file.name
+
+            # Leer el archivo Excel
+            df = pd.read_excel(temp_file_path)
+
+            # Descomponer celdas combinadas
+            df = descomponer_celdas_combinadas(df)
+
+            # Rellenar valores nulos en todas las columnas
+            for column in df.columns:
+                df[column] = df[column].fillna(method="ffill")  # Rellenar hacia adelante
+
+            # Mapeo flexible de columnas
+            columnas_requeridas = {
+                "ubicacion": ["Ubicación"],
+                "ip": ["IP"],
+                "nombre_activo": ["Nombre"],
+                "marca": ["Marca"],
+                "modelo": ["Modelo"],
+                "tipo_hw": ["Tipo de HW"],
+                "numero_serie": ["Número de Serie"],
+                "requiere_upgrade": ["Requiere Upgrade"],
+                "requiere_mantenimiento": ["Requiere Mantenimiento"],
+                "numero_mantenimientos": ["N° de Mantenimientos"],
+                "modelo_vigente": ["Modelo Vigente"],
+                "descripcion": ["Descripción"],
+            }
+
+            # Renombrar columnas según el mapeo
+            mapeo_columnas = {v[0]: k for k, v in columnas_requeridas.items()}
+            df.rename(columns=mapeo_columnas, inplace=True)
+
+            # Validar columnas requeridas
+            for col in columnas_requeridas.keys():
+                if col not in df.columns:
+                    df[col] = None
+
+            # Limpiar y normalizar valores
+            df["nombre_activo"] = df["nombre_activo"].fillna("Nombre no definido")  # Reemplazo para valores nulos
+            df["numero_mantenimientos"] = pd.to_numeric(df["numero_mantenimientos"], errors="coerce").fillna(0).astype(int)
+
+            # Crear registros
+            registros = []
+            for _, row in df.iterrows():
+                registros.append(ControlActivo(
+                    cliente_id=cliente_id,
+                    ubicacion=row["ubicacion"],
+                    ip=row["ip"],
+                    nombre_activo=row["nombre_activo"],
+                    marca=row["marca"],
+                    modelo=row["modelo"],
+                    tipo_hw=row["tipo_hw"],
+                    numero_serie=row["numero_serie"],
+                    requiere_upgrade=row["requiere_upgrade"],
+                    requiere_mantenimiento=row["requiere_mantenimiento"],
+                    numero_mantenimientos=row["numero_mantenimientos"],
+                    modelo_vigente=row["modelo_vigente"],
+                    descripcion=row["descripcion"],
+                ))
+
+            # Guardar en la base de datos
+            ControlActivo.objects.bulk_create(registros)
+            os.remove(temp_file_path)
+
+            return JsonResponse({"success": True, "message": "Archivo procesado y datos cargados correctamente."})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"Error al procesar el archivo: {str(e)}"})
+
+    return JsonResponse({"success": False, "message": "Método no permitido."})
+
+# Filtrar activos por cliente
+@login_required
 def filtrar_activos(request):
     cliente_id = request.GET.get("cliente_id")
-    if not cliente_id:
-        return JsonResponse([], safe=False)
-
-    activos = ControlActivo.objects.filter(cliente_id=cliente_id).values(
-        "ubicacion", "ip", "nombre_activo", "marca", "modelo",
-        "tipo_hw", "numero_serie", "requiere_upgrade", 
-        "requiere_mantenimiento", "numero_mantenimientos",
-        "modelo_vigente", "descripcion"
-    )
+    activos = ControlActivo.objects.filter(cliente_id=cliente_id).values() if cliente_id else []
     return JsonResponse(list(activos), safe=False)
 
+# Agregar un activo manualmente
+@login_required
+@csrf_exempt
+def agregar_activo(request):
+    if request.method == "POST":
+        data = request.POST
+        cliente_id = data.get("cliente_id")
+        try:
+            cliente = Cliente.objects.get(id=cliente_id)
+            ControlActivo.objects.create(
+                cliente=cliente,
+                nombre_activo=data.get("nombre_activo", ""),
+                ubicacion=data.get("ubicacion", ""),
+                ip=data.get("ip", ""),
+                marca=data.get("marca", ""),
+                modelo=data.get("modelo", ""),
+                tipo_hw=data.get("tipo_hw", ""),
+                numero_serie=data.get("numero_serie", ""),
+                requiere_upgrade=data.get("requiere_upgrade", ""),
+                requiere_mantenimiento=data.get("requiere_mantenimiento", ""),
+                numero_mantenimientos=data.get("numero_mantenimientos", 0),
+                modelo_vigente=data.get("modelo_vigente", ""),
+                descripcion=data.get("descripcion", "")
+            )
+            return JsonResponse({"success": True, "message": "Activo agregado correctamente."})
+        except Cliente.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Cliente no encontrado."})
+    return JsonResponse({"success": False, "message": "Método no permitido."}, status=405)
+
+# Editar un activo existente
+@login_required
+@csrf_exempt
+def editar_activo(request, activo_id):
+    activo = get_object_or_404(ControlActivo, id=activo_id)
+
+    if request.method == "GET":
+        # Devuelve los datos del activo en formato JSON
+        return JsonResponse({
+            'id': activo.id,
+            'nombre_activo': activo.nombre_activo,
+            'ubicacion': activo.ubicacion,
+            'ip': activo.ip,
+            'marca': activo.marca,
+            'modelo': activo.modelo,
+            'tipo_hw': activo.tipo_hw,
+            'numero_serie': activo.numero_serie,
+            'requiere_upgrade': activo.requiere_upgrade,
+            'requiere_mantenimiento': activo.requiere_mantenimiento,
+            'numero_mantenimientos': activo.numero_mantenimientos,
+            'modelo_vigente': activo.modelo_vigente,
+            'descripcion': activo.descripcion,
+        })
+
+    elif request.method == "POST":
+        # Actualiza los datos del activo
+        data = request.POST
+        try:
+            activo.nombre_activo = data.get("nombre_activo", activo.nombre_activo)
+            activo.ubicacion = data.get("ubicacion", activo.ubicacion)
+            activo.ip = data.get("ip", activo.ip)
+            activo.marca = data.get("marca", activo.marca)
+            activo.modelo = data.get("modelo", activo.modelo)
+            activo.tipo_hw = data.get("tipo_hw", activo.tipo_hw)
+            activo.numero_serie = data.get("numero_serie", activo.numero_serie)
+            activo.requiere_upgrade = data.get("requiere_upgrade", activo.requiere_upgrade)
+            activo.requiere_mantenimiento = data.get("requiere_mantenimiento", activo.requiere_mantenimiento)
+            activo.numero_mantenimientos = data.get("numero_mantenimientos", activo.numero_mantenimientos)
+            activo.modelo_vigente = data.get("modelo_vigente", activo.modelo_vigente)
+            activo.descripcion = data.get("descripcion", activo.descripcion)
+            activo.save()
+
+            return JsonResponse({"success": True, "message": "Activo actualizado correctamente."})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+
+# Eliminar un activo
+@csrf_exempt
+def eliminar_activo(request, activo_id):
+    if request.method == 'POST':
+        try:
+            activo = get_object_or_404(ControlActivo, id=activo_id)
+            activo.delete()
+            return JsonResponse({'success': True, 'message': 'Activo eliminado correctamente.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
 @login_required
 def detalle_cliente(request, cliente_id):
@@ -164,6 +333,13 @@ def detalle_cliente(request, cliente_id):
         'secciones': secciones,
         'es_supervisor': es_supervisor,
     })
+
+# Vista para eliminar un cliente
+def eliminar_cliente(request, cliente_id):
+    cliente = get_object_or_404(Cliente, pk=cliente_id)
+    cliente.delete()
+    return redirect('lista_clientes')
+
 
 def generar_rowspan(filas, columna_clave):
     """

@@ -1,42 +1,58 @@
 import pdfplumber
 import pandas as pd
 import json
-from .models import Cliente, TablaCliente, FilaTabla, SeccionCliente
+from .models import Cliente, TablaCliente, FilaTabla, SeccionCliente, ControlActivo
 
 
 def procesar_archivo(file_path):
     data = []
+    columnas_requeridas = [
+        'Ubicación', 'IP', 'Nombre', 'Marca', 'Modelo', 'Tipo de HW',
+        'Número de Serie', 'Requiere Upgrade', 'Requiere Mantenimiento',
+        'N° de Mantenimientos', 'Modelo Vigente', 'Descripción'
+    ]
+
+    column_mapping = {
+        'Ubicación': 'ubicacion',
+        'IP': 'ip',
+        'Nombre': 'nombre_activo',
+        'Marca': 'marca',
+        'Modelo': 'modelo',
+        'Tipo de HW': 'tipo_hw',
+        'Número de Serie': 'numero_serie',
+        'Requiere Upgrade': 'requiere_upgrade',
+        'Requiere Mantenimiento': 'requiere_mantenimiento',
+        'N° de Mantenimientos': 'numero_mantenimientos',
+        'Modelo Vigente': 'modelo_vigente',
+        'Descripción': 'descripcion'
+    }
+
     try:
-        if file_path.endswith('.pdf'):
-            with pdfplumber.open(file_path) as pdf:
-                for page in pdf.pages:
-                    table = page.extract_table()
-                    if table:
-                        headers = table[0]  # Primera fila como encabezados
-                        rows = table[1:]    # Las siguientes filas son datos
-                        for row in rows:
-                            data.append(dict(zip(headers, row)))
-        elif file_path.endswith('.xlsx'):
+        if file_path.endswith('.xlsx'):
             # Leer archivo Excel
-            df = pd.read_excel(file_path, header=0)  # Primera fila como cabecera
-            
-            # Descomponer filas combinadas (función personalizada)
-            df = descomponer_filas_combinadas(df)
-            
-            # Eliminar columnas con nombres no definidos ('Unnamed')
-            df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+            df = pd.read_excel(file_path, header=0)
 
-            # Renombrar columnas 'Unnamed' o sin nombre con nombres genéricos
-            df.columns = [
-                f"Columna_{i}" if "Unnamed" in str(col) else col
-                for i, col in enumerate(df.columns)
-            ]
+            # Normalizar nombres de columnas
+            df.columns = df.columns.str.strip()
 
-            # Rellenar valores nulos con un texto genérico
-            df.fillna("Valor no definido", inplace=True)
-            
-            # Convertir el DataFrame a una lista de diccionarios
+            # Verificar columnas faltantes
+            columnas_faltantes = [col for col in columnas_requeridas if col not in df.columns]
+            for col in columnas_faltantes:
+                df[col] = None  # Añadir columnas faltantes con valores nulos
+
+            # Renombrar columnas según el mapeo
+            df.rename(columns=column_mapping, inplace=True)
+
+            # Rellenar valores nulos según el tipo de columna
+            for col in df.columns:
+                if df[col].dtype == 'object':  # Si es una columna de texto
+                    df[col].fillna("Valor no definido", inplace=True)
+                else:  # Si es una columna numérica
+                    df[col].fillna(0, inplace=True)
+
+            # Convertir DataFrame a lista de diccionarios
             data = df.to_dict(orient='records')
+
     except Exception as e:
         print(f"Error al procesar archivo: {e}")
     return data
@@ -105,24 +121,36 @@ def procesar_archivo_y_guardar(file_path, cliente_id, seccion_id, nombre_tabla=N
         validar_datos(datos_procesados)  # Valida los datos
 
         cliente = Cliente.objects.get(id=cliente_id)
-        seccion = SeccionCliente.objects.get(id=seccion_id)
 
         # Generar un nombre de tabla predeterminado si no se proporciona uno
         if not nombre_tabla:
             nombre_tabla = f"Tabla procesada para Sección {seccion_id}"
 
-        # Obtener o crear la tabla asociada
+        # Procesar datos para ControlActivo (sin sección asociada)
+        if not seccion_id:
+            # Borrar activos existentes para evitar duplicados
+            ControlActivo.objects.filter(cliente=cliente).delete()
+
+            # Crear nuevos registros
+            for fila in datos_procesados:
+                ControlActivo.objects.create(cliente=cliente, **fila)
+            return None
+
+        # Procesar datos para TablaCliente (si se proporciona seccion_id)
+        seccion = SeccionCliente.objects.get(id=seccion_id)
+
+        # Crear o actualizar tabla asociada
         tabla, created = TablaCliente.objects.get_or_create(
             cliente=cliente,
             seccion=seccion,
-            defaults={'nombre_tabla': nombre_tabla}
+            defaults={'nombre_tabla': nombre_tabla or f"Tabla procesada para Sección {seccion_id}"}
         )
 
-        # Limpiar las filas existentes si la tabla ya existía
+        # Borrar filas existentes si la tabla ya existía
         if not created:
             tabla.filas.all().delete()
 
-        # Guardar las nuevas filas en la tabla
+        # Crear nuevas filas en la tabla
         filas = [FilaTabla(tabla=tabla, datos=fila) for fila in datos_procesados]
         FilaTabla.objects.bulk_create(filas)
 
