@@ -12,18 +12,31 @@
 </head>
 <body>
     <header>
-        <div class="navbar bg-dark text-white px-3">
-            <a href="{% url 'main_menu' %}" class="logo text-decoration-none text-white">Cyber WIKI</a>
+        <div class="navbar">
+            <a href="{% url 'main_menu' %}" class="logo">Cyber WIKI</a>
             <nav>
-                <a href="{% url 'lista_clientes' %}" class="text-decoration-none text-white">Información Clientes</a>
-                <a href="{% url 'detalle_cliente' 2 %}" class="text-decoration-none text-white">Información Cyberline</a>
-                <a href="{% url 'control_activos' %}" class="text-decoration-none text-white">Control de Activos</a>
+                <a href="{% url 'lista_clientes' %}">Información Clientes</a>
+                <a href="{% url 'detalle_cliente' 2 %}">Información Cyberline</a>
+                <a href="{% url 'control_activos' %}">Control de Activos</a>
             </nav>
             <div class="user-info">
-                <span class="welcome-text text-white">Bienvenido, {{ request.user.first_name }}</span>
+                <span class="welcome-text">Bienvenido, {{ request.user.first_name }}</span>
+                <div class="dropdown-content">
+                    <a href="{% url 'logout' %}">Cerrar sesión</a>
+                </div>
             </div>
         </div>
     </header>
+
+    <main class="detalle-container">
+        <div class="row align-items-center mb-4">
+            <div class="col-md-3 text-center">
+                <img src="{{ cliente.logo.url }}" alt="Logo de {{ cliente.nombre_cliente }}" class="logo-cliente img-fluid shadow">
+            </div>
+            <div class="col-md-9">
+                <h1 class="detalle-titulo">{{ cliente.nombre_cliente }}</h1>
+            </div>
+        </div>
 
     <main class="container mt-4">
         <h2 class="text-center mb-4">Control de Activos</h2>
