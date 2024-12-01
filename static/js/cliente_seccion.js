@@ -28,7 +28,7 @@ function mostrarModalEditar(clienteId, seccionId, titulo, contenido) {
     Swal.fire({
         title: 'Editar Sección',
         html: `
-            <form id="editarSeccionForm">
+            <form id="editarSeccionForm" enctype="multipart/form-data">
                 <label for="titulo">Título</label>
                 <input id="titulo" name="titulo" class="form-control mb-3" value="${titulo || ''}" required>
                 <label for="contenido">Contenido</label>
@@ -40,7 +40,8 @@ function mostrarModalEditar(clienteId, seccionId, titulo, contenido) {
         confirmButtonText: 'Guardar',
         showCancelButton: true,
         preConfirm: () => {
-            const formData = new FormData(document.getElementById('editarSeccionForm'));
+            const form = document.getElementById('editarSeccionForm');
+            const formData = new FormData(form);
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             return fetch(`/clientes/${clienteId}/secciones/${seccionId}/editar/`, {

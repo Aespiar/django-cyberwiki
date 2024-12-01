@@ -80,31 +80,60 @@ def normalizar_datos(datos):
         datos_normalizados.append(fila_normalizada)
     return datos_normalizados
 
-def procesar_archivo_y_guardar(file_path, cliente_id, seccion_id):
-    datos_procesados = procesar_archivo(file_path)
-    datos_procesados = normalizar_datos(datos_procesados)  # Normaliza los datos
-    validar_datos(datos_procesados)  # Valida los datos
+def procesar_archivo_y_guardar(file_path, cliente_id, seccion_id, nombre_tabla=None):
+    """
+    Procesa un archivo subido y guarda los datos en una tabla asociada a una sección.
+    
+    Args:
+        file_path (str): Ruta del archivo a procesar.
+        cliente_id (int): ID del cliente asociado.
+        seccion_id (int): ID de la sección asociada.
+        nombre_tabla (str, opcional): Nombre personalizado para la tabla. 
+                                       Por defecto, se genera un nombre automático.
+    Returns:
+        tabla (TablaCliente): La tabla procesada y actualizada.
+    Raises:
+        Exception: Si ocurre un error al procesar el archivo o guardar datos.
+    """
+    if not file_path:
+        raise ValueError("La ruta del archivo no puede estar vacía.")
 
-    cliente = Cliente.objects.get(id=cliente_id)
-    seccion = SeccionCliente.objects.get(id=seccion_id)
-
-    # Verificar si ya existe una tabla asociada
-    tabla, created = TablaCliente.objects.get_or_create(
-        cliente=cliente,
-        seccion=seccion,
-        nombre_tabla=f"Tabla procesada para Sección {seccion_id}"
-    )
-
-    # Borrar filas existentes si ya había una tabla
-    if not created:
-        tabla.filas.all().delete()
-
-    # Guardar filas procesadas
     try:
-        FilaTabla.objects.bulk_create([FilaTabla(tabla=tabla, datos=fila) for fila in datos_procesados])
-    except Exception as e:
-        print(f"Error al intertar filas: {e}")
-        raise e  # Lanza el error para depuración
+        # Procesar el archivo en formato DataFrame o similar
+        datos_procesados = procesar_archivo(file_path)
+        datos_procesados = normalizar_datos(datos_procesados)  # Normaliza los datos
+        validar_datos(datos_procesados)  # Valida los datos
 
-    return tabla
+        cliente = Cliente.objects.get(id=cliente_id)
+        seccion = SeccionCliente.objects.get(id=seccion_id)
+
+        # Generar un nombre de tabla predeterminado si no se proporciona uno
+        if not nombre_tabla:
+            nombre_tabla = f"Tabla procesada para Sección {seccion_id}"
+
+        # Obtener o crear la tabla asociada
+        tabla, created = TablaCliente.objects.get_or_create(
+            cliente=cliente,
+            seccion=seccion,
+            defaults={'nombre_tabla': nombre_tabla}
+        )
+
+        # Limpiar las filas existentes si la tabla ya existía
+        if not created:
+            tabla.filas.all().delete()
+
+        # Guardar las nuevas filas en la tabla
+        filas = [FilaTabla(tabla=tabla, datos=fila) for fila in datos_procesados]
+        FilaTabla.objects.bulk_create(filas)
+
+        return tabla
+
+    except FileNotFoundError:
+        print(f"El archivo no se encontró: {file_path}")
+        raise
+
+    except Exception as e:
+        print(f"Error al procesar y guardar el archivo: {e}")
+        raise
+
 

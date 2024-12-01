@@ -8,7 +8,7 @@ from django.http import JsonResponse, HttpResponse
 from .forms import SeccionClienteForm, ExcelUploadForm
 from django.templatetags.static import static
 import pandas as pd
-import json,os
+import json,os,tempfile
 from io import BytesIO
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
@@ -211,17 +211,46 @@ def agregar_seccion(request, cliente_id):
     return JsonResponse({"success": False, "message": "Método no permitido."}, status=405)
 
 @login_required
+@csrf_exempt
 def editar_seccion(request, cliente_id, seccion_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
     seccion = get_object_or_404(SeccionCliente, id=seccion_id)
 
     if request.method == 'POST':
-        form = SeccionClienteForm(request.POST, request.FILES, instance=seccion)  # Asegúrate de incluir request.FILES
+        # Incluye tanto request.POST como request.FILES para manejar archivos
+        form = SeccionClienteForm(request.POST, request.FILES, instance=seccion)
         if form.is_valid():
-            form.save()
+            archivo = form.cleaned_data.get('archivo')
+
+            if archivo:
+                # Guardar temporalmente el archivo para procesarlo
+                with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(archivo.name)[1]) as temp_file:
+                    for chunk in archivo.chunks():
+                        temp_file.write(chunk)
+                    temp_file_path = temp_file.name
+
+                try:
+                    # Procesar el archivo usando la ruta temporal
+                    procesar_archivo_y_guardar(
+                        file_path=temp_file_path,
+                        cliente_id=cliente_id,
+                        seccion_id=seccion_id,
+                        nombre_tabla=f"Datos actualizados para {seccion.titulo}"
+                    )
+
+                    # Asignar el archivo procesado al campo 'archivo' de la sección
+                    seccion.archivo.save(archivo.name, archivo, save=True)
+
+                finally:
+                    # Asegurarse de eliminar el archivo temporal
+                    os.remove(temp_file_path)
+            else:
+                # Si no hay archivo, simplemente guarda la sección
+                form.save()
+
             return JsonResponse({"success": True, "message": "Sección actualizada correctamente."})
         else:
-            print("Errores del formulario:", form.errors)  # Depuración de errores
+            print("Errores del formulario:", form.errors)
             return JsonResponse({"success": False, "message": "Formulario inválido.", "errors": form.errors.as_json()})
 
     return JsonResponse({"success": False, "message": "Método no permitido."}, status=405)
