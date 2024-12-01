@@ -7,7 +7,7 @@ class SeccionClienteForm(forms.ModelForm):
     """
     class Meta:
         model = SeccionCliente
-        fields = ['titulo', 'contenido']  # Campos a mostrar en el formulario
+        fields = ['titulo', 'contenido', 'archivo']  # Incluye 'archivo'
 
 class ExcelUploadForm(forms.Form):
     cliente_id = forms.ModelChoiceField(queryset=Cliente.objects.all(), label="Seleccionar Cliente")

@@ -27,12 +27,6 @@ def lista_clientes(request):
             cliente.logo = 'logos/default_logo.jpg'
     return render(request, 'clientes/clientes.html', {'clientes': clientes})
 
-
-# Vista para el detalle de cada cliente
-def detalle_cliente(request, cliente_id):
-    cliente = get_object_or_404(Cliente, pk=cliente_id)
-    return render(request, 'clientes/detalle_cliente.html', {'cliente': cliente})
-
 # Vista para agregar un cliente
 def agregar_cliente(request):
     if request.method == 'POST':
@@ -64,7 +58,7 @@ def editar_cliente(request, cliente_id):
         if 'logo' in request.FILES:
             cliente.logo = request.FILES['logo']
         cliente.save()
-        return redirect('lista_clientes')  # Redirige a la lista de clientes
+        return redirect('lista_clientes')
     return render(request, 'clientes/editar_cliente.html', {'cliente': cliente})
 
 # Vista para eliminar un cliente
@@ -201,25 +195,47 @@ def historial_seccion(request, cliente_id, seccion_id):
         'es_supervisor' : request.user.rol == 'Supervisor'
     })
 
+@login_required
+def agregar_seccion(request, cliente_id):
+    cliente = get_object_or_404(Cliente, id=cliente_id)
+
+    if request.method == 'POST':
+        form = SeccionClienteForm(request.POST, request.FILES)
+        if form.is_valid():
+            seccion = form.save(commit=False)
+            seccion.cliente = cliente
+            seccion.save()
+            return JsonResponse({"success": True, "message": "Sección agregada correctamente."})
+        return JsonResponse({"success": False, "message": "Formulario inválido."})
+
+    return JsonResponse({"success": False, "message": "Método no permitido."}, status=405)
+
+@login_required
 def editar_seccion(request, cliente_id, seccion_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
     seccion = get_object_or_404(SeccionCliente, id=seccion_id)
 
     if request.method == 'POST':
-        form = SeccionClienteForm(request.POST, instance=seccion)
+        form = SeccionClienteForm(request.POST, request.FILES, instance=seccion)  # Asegúrate de incluir request.FILES
         if form.is_valid():
-            # Verifica si el modelo tiene historial habilitado
-            if hasattr(seccion, 'history') and hasattr(seccion, 'history_change_reason'):
-                update_change_reason(seccion, "Edición manual desde la interfaz")
-            else:
-                messages.error(request, "No se pudo registrar el motivo del cambio.")
-            form.save()  # Guarda los cambios
-            messages.success(request, "Sección actualizada correctamente.")
-            return redirect('detalle_cliente', cliente_id=cliente.id)
-    else:
-        form = SeccionClienteForm(instance=seccion)
+            form.save()
+            return JsonResponse({"success": True, "message": "Sección actualizada correctamente."})
+        else:
+            print("Errores del formulario:", form.errors)  # Depuración de errores
+            return JsonResponse({"success": False, "message": "Formulario inválido.", "errors": form.errors.as_json()})
 
-    return render(request, 'clientes/editar_seccion.html', {'form': form, 'cliente': cliente})
+    return JsonResponse({"success": False, "message": "Método no permitido."}, status=405)
+
+@csrf_exempt
+def eliminar_seccion(request, cliente_id, seccion_id):
+    cliente = get_object_or_404(Cliente, id=cliente_id)
+    seccion = get_object_or_404(SeccionCliente, id=seccion_id, cliente=cliente)
+
+    if request.method == 'POST':
+        seccion.delete()
+        return JsonResponse({"success": True, "message": "Sección eliminada correctamente."})
+
+    return JsonResponse({"success": False, "message": "Método no permitido."}, status=405)
 
 def restaurar_seccion(request, cliente_id, seccion_id, historial_id):
     # Obtener la sección principal
@@ -254,23 +270,6 @@ def obtener_secciones(request, cliente_id):
     secciones = cliente.secciones.values('titulo', 'contenido', 'ultima_actualizacion')
     return JsonResponse({'secciones': list(secciones)})
 
-
-
-def agregar_seccion(request, cliente_id):
-    """
-    Vista para agregar una nueva sección a un cliente específico.
-    """
-    cliente = get_object_or_404(Cliente, id=cliente_id)
-    if request.method == 'POST':
-        form = SeccionClienteForm(request.POST)
-        if form.is_valid():
-            seccion = form.save(commit=False)
-            seccion.cliente = cliente  # Asocia la sección al cliente
-            seccion.save()
-            return redirect('detalle_cliente', cliente_id=cliente.id)  # Redirige al detalle del cliente
-    else:
-        form = SeccionClienteForm()
-    return render(request, 'clientes/agregar_seccion.html', {'form': form, 'cliente': cliente})
 
 def editar_fila(request, fila_id):
     if request.method == "POST":

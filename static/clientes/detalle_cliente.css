@@ -187,3 +187,16 @@ button {
 .btn-success:hover {
     background-color: #003f8a;
 }
+
+.modal-header {
+    background-color: #0057b8;
+    color: white;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
