@@ -50,8 +50,9 @@ INSTALLED_APPS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-LOGIN_REDIRECT_URL = 'main_menu'  # URL a donde se redirige tras el login
-LOGIN_URL = 'login'  # URL del login si un usuario no autenticado intenta acceder
+LOGIN_URL = '/login/'  # Ruta de inicio de sesión
+LOGIN_REDIRECT_URL = '/main_menu/'  # Redirigir después de iniciar sesión
+LOGOUT_REDIRECT_URL = '/login/'  # Redirigir después de cerrar sesión
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -156,13 +157,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/'
 PLANTILLAS_INTERNAS = os.path.join(BASE_DIR, 'media/plantillas_internas')
 
-#Definir la carpeta estática
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Carpeta para recopilar archivos en producción
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Carpeta para cargar archivos de usuario
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
