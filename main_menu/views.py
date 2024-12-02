@@ -39,35 +39,45 @@ def actualizar_personal(request, personal_id):
 @login_required
 def agregar_personal(request):
     if request.method == 'POST':
-        # Solo los usuarios con rol de Supervisor pueden agregar personal
-        if request.user.rol == 'Supervisor':
+        if not request.user.is_authenticated:
+             print(f"Usuario: {request.user}, Autenticado: {request.user.is_authenticated}")
+             return JsonResponse({'error': 'Usuario no autenticado'}, status=403)
+        
+        # Verificar si el usuario tiene permisos para agregar personal
+        if request.user.rol != 'Supervisor':
+            return JsonResponse({'error': 'No tienes permisos para agregar personal'}, status=403)
+        
+        try:
             # Obtener los datos del formulario
             nombre = request.POST.get('nombre')
             turno = request.POST.get('turno')
             rol = request.POST.get('rol')
 
-            # Verificar si se cargó una imagen o usar el valor predeterminado
-            if 'imagen' in request.FILES:
-                imagen = request.FILES['imagen']  # Se utiliza la imagen cargada
-            else:
-                imagen = 'avatars/avatar.png'  # Valor predeterminado si no se cargó una imagen
+            # Validar que todos los campos requeridos estén presentes
+            if not all([nombre, turno, rol]):
+                return JsonResponse({'error': 'Todos los campos son obligatorios'}, status=400)
 
-            # Crear el objeto de personal
-            Personal.objects.create(
+            # Verificar si se cargó una imagen
+            if 'imagen' in request.FILES:
+                imagen = request.FILES['imagen']
+            else:
+                imagen = 'avatars/avatar.png'  # Valor predeterminado
+
+            # Crear el objeto Personal
+            personal = Personal.objects.create(
                 nombre=nombre,
                 turno=turno,
                 rol=rol,
                 imagen=imagen
             )
-            return redirect('main_menu')
-        else:
-            return HttpResponseForbidden("No tienes permisos para agregar personal.")
-    else:
-        # Renderizar la plantilla para agregar personal
-        if request.user.rol == 'Supervisor':
-            return render(request, 'main_menu/agregar_personal.html')
-        else:
-            return HttpResponseForbidden("No tienes permisos para acceder a esta sección.")
+            return JsonResponse({'success': 'Personal agregado exitosamente', 'id': personal.id})
+        
+        except Exception as e:
+            # Capturar cualquier error y devolverlo como respuesta JSON
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    # Si no es un método POST, devolver un error
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
     
 @login_required
 def editar_personal(request, personal_id):

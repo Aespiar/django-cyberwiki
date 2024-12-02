@@ -58,6 +58,7 @@
         <main>
             <!-- Botón para Abrir el Modal -->
             <div class="agregar-personal-container">
+                {% csrf_token %}
                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#agregarPersonalModal">
                     Agregar Personal
                 </button>
@@ -72,8 +73,8 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <form method="POST" enctype="multipart/form-data" id="formAgregarPersonal">
+                            {% csrf_token %}
                             <div class="modal-body">
-                                {% csrf_token %}
                                 <div class="mb-3">
                                     <label for="nombre" class="form-label">Nombre:</label>
                                     <input type="text" class="form-control" id="nombre" name="nombre" required>
@@ -146,20 +147,29 @@
         <script>
             document.getElementById("formAgregarPersonal").addEventListener("submit", function (e) {
                 e.preventDefault(); // Evitar recargar la página
+
                 const formData = new FormData(this);
-        
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Tomar el token desde el formulario
+
                 fetch("{% url 'agregar_personal' %}", {
                     method: "POST",
                     body: formData,
                     headers: {
-                        "X-CSRFToken": "{{ csrf_token }}"
-                    }
+                        "X-CSRFToken": csrfToken, // Usar el token dinámicamente
+                    },
                 })
                 .then(response => {
                     if (response.ok) {
-                        location.reload(); // Recargar la página para ver los cambios
+                        response.json().then(data => {
+                            if (data.success) {
+                                alert(data.success); // Mostrar un mensaje de éxito
+                                location.reload(); // Recargar la página para ver los cambios
+                            } else if (data.error) {
+                                alert(data.error); // Mostrar el mensaje de error específico
+                            }
+                        });
                     } else {
-                        alert("Hubo un error al agregar el personal. Intenta de nuevo.");
+                        alert("Error al agregar personal. Código de estado: " + response.status);
                     }
                 })
                 .catch(error => console.error("Error:", error));

@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,8 +27,22 @@ SECRET_KEY = 'django-insecure-^3yu%_%z4ht1qy$2bul+!s^j^&@q692k$3pe!8rv1)-g_a1cq0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['cyberlinewiki-5c0c7dcd040c.herokuapp.com']
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_TMP = os.path.join(BASE_DIR, 'static')
+
+os.makedirs(STATIC_TMP, exist_ok=True)
+os.makedirs(STATIC_ROOT, exist_ok=True)
+
+STATIC_URL = 'static/'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://cyberlinewiki-5c0c7dcd040c.herokuapp.com',
+]
+SESSION_COOKIE_AGE = 3600  # 1 hora en segundos
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Application definition
 
@@ -50,20 +63,20 @@ INSTALLED_APPS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-LOGIN_URL = '/login/'  # Ruta de inicio de sesión
-LOGIN_REDIRECT_URL = '/main_menu/'  # Redirigir después de iniciar sesión
-LOGOUT_REDIRECT_URL = '/login/'  # Redirigir después de cerrar sesión
+LOGIN_URL = '/login/'  # Asegúrate de que la URL de login sea correcta
+LOGIN_REDIRECT_URL = '/'  # Donde redirige después de iniciar sesión
+LOGOUT_REDIRECT_URL = '/login/'  # Donde redirige después de cerrar sesión
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Whitenoise para archivos estáticos
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise debe estar aquí
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware'
+    'simple_history.middleware.HistoryRequestMiddleware',  # Y simple_history aquí
 ]
 
 ROOT_URLCONF = 'CyberWiky.urls'
@@ -91,32 +104,11 @@ WSGI_APPLICATION = 'CyberWiky.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'railway',  # Nombre de tu base de datos
-        'USER': 'root',  # Usuario
-        'PASSWORD': 'EYBLCGmVMpGUhQjmOveUwyPhSRXNBapY',  # Contraseña
-        'HOST': 'junction.proxy.rlwy.net',  # Host público
-        'PORT': '59611',  # Puerto público
-    }
+    'default': dj_database_url.config(
+        default='postgres://ub14t4l5eor4mo:p800c90b63ac975df1d5585b9667df495d1a21082f7b4fde3ca5f477ff7c5c8b7@c9mq4861d16jlm.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d72ib5j4tcnnnm'
+    )
 }
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
-    },
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -159,15 +151,13 @@ USE_TZ = True
 
 PLANTILLAS_INTERNAS = os.path.join(BASE_DIR, 'media/plantillas_internas')
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Carpeta para recopilar archivos en producción
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Carpeta para cargar archivos de usuario
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+#Definir la carpeta estática
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

@@ -1,0 +1,300 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+}
+
+.navbar {
+    background: linear-gradient(90deg, #002f6c, #0057b8);
+    margin: 8px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.navbar .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+.navbar .logo:hover{
+    color: #50cbe0;
+}
+
+body, h3, p, a {
+    font-family: 'Playfair Display', serif;
+}
+
+.navbar .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    padding: 10px;
+}
+
+.logo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+}
+
+
+.navbar nav a {
+    color: rgb(252, 247, 247);
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.navbar nav a:hover {
+    color: #50cbe0;
+}
+
+.user-info {
+    position: relative;
+    font-size: 0.9rem;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: transparent;
+    padding: 8px 12px;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 5px;
+}
+
+.user-info:hover {
+    background-color: #003f8a;
+}
+
+.user-info .dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #003f8a;
+    min-width: 150px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.user-info:hover .dropdown-content {
+    display: block;
+    pointer-events: auto;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: block;
+    border-bottom: 1px solid #002f6c;
+}
+
+.dropdown-content a:hover {
+    background-color: #002f6c;
+}
+
+/* Main Section */
+main {
+    padding: 20px;
+}
+
+/* Turnos Container */
+.turnos-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Tarjeta de Personal */
+.turno-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    padding: 15px;
+    text-align: center;
+    position: relative;
+}
+
+.turno-card img.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.turno-card h3 {
+    font-size: 1.2em;
+    margin: 0;
+}
+
+.turno-card .turno,
+.turno-card .rol {
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+
+/* Actions in Turno-Card */
+.turno-card .actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.turno-card .btn {
+    font-size: 0.9em;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    margin: 5px;
+}
+
+.turno-card .btn.edit-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.turno-card .btn.delete-btn {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+/* Agregar Personal Button */
+.add-btn {
+    display: block;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1em;
+    text-align: center;
+    margin: 20px auto;
+    width: fit-content;
+    transition: background-color 0.3s ease;
+}
+
+.add-btn:hover {
+    background-color: #218838;
+}
+
+/* Form Section */
+.form-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    margin: 0 auto;
+}
+
+.form-container label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-container input[type="text"],
+.form-container input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.form-container .btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1em;
+}
+
+.form-container .btn.save-btn {
+    background-color: #007bff;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.form-container .btn.cancel-btn {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+/* Centrar el botón de "Agregar Personal" */
+.container-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap; /* Permite que las tarjetas se ajusten en líneas si el espacio no alcanza */
+}
+
+.btn-agregar {
+    align-self: center; /* Centra el botón dentro del contenedor */
+    margin-bottom: 20px;
+}
+
+.agregar-personal-container {
+    display: flex;
+    justify-content: center; /* Centrar horizontalmente */
+    margin-top: 20px; /* Espaciado superior */
+}
+
+
+/* Leyenda */
+.leyenda {
+    background-color: rgb(156, 212, 250);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 25px auto;
+    max-width: 800px;
+}
+
+.leyenda h4 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #003366;
+}
+
+.leyenda p {
+    font-size: 0.9em;
+    margin: 5px 0;
+    line-height: 1.5;
+    text-align: justify;
+}

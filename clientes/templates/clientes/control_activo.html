@@ -30,6 +30,9 @@
 
     <main class="detalle-container">
         <div class="row align-items-center mb-4">
+            <div class="col-md-3 text-center">
+                <img src="{{ cliente.logo.url }}" alt="Logo de {{ cliente.nombre_cliente }}" class="logo-cliente img-fluid shadow">
+            </div>
             <div class="col-md-9">
                 <h1 class="detalle-titulo">{{ cliente.nombre_cliente }}</h1>
             </div>

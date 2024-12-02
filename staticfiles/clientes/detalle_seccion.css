@@ -1,0 +1,555 @@
+/* Limitar el espacio de la página */
+.page-container {
+    padding: 0px;
+    border-radius: 8px; /* Bordes redondeados */
+}
+/* === General === */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* Títulos principales */
+h2, h3 {
+    font-family: 'Roboto', sans-serif;
+    padding: 10px;
+    vertical-align: center;
+    margin: 10px 0 20px 0;
+    font-size: 1.5rem;
+    color: #064b79;
+    font-weight: bold;
+    position: relative;
+    display: inline-block;
+}
+
+h2::before, h3::before {
+    content: '';
+    position: absolute;
+    left: 10;
+    padding: 0px auto;
+    bottom: -5px;
+    height: 3px;
+    width: 50px;
+    background-color: #0057b8;
+    border-radius: 5px;
+}
+
+
+/* Contenedor Principal */
+.container {
+    max-width: 95%; /* Asegura que no ocupe más del 95% de la ventana */
+    margin: auto;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: hidden; /* Evita que elementos se desborden horizontalmente */
+}
+/* === Menú de Navegación === */
+.custom-navbar {
+    background: linear-gradient(90deg, #002f6c, #0057b8);
+    color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.custom-navbar .navbar-brand {
+    font-size: 1.8rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    color: white;
+    text-transform: uppercase;
+    margin-right: 20px;
+}
+
+.custom-navbar .navbar-brand:hover {
+    text-decoration: none;
+    color: #50cbe0;
+}
+
+.custom-navbar .nav-link {
+    color: rgb(196, 187, 187);
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0 10px;
+}
+
+.custom-navbar .nav-link:hover {
+    color: #50cbe0;
+}
+
+/* === Usuario y Dropdown === */
+.user-info {
+    position: relative;
+    padding: 5px 15px; /* Reducido para menor altura */
+    font-size: 0.9rem; /* Tamaño más compacto */
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 0px;
+    background-color: transparent; /* Sin fondo inicialmente */
+    text-decoration: none;
+    display: inline-block;
+}
+
+.user-info:hover {
+    background-color: #003f8a; /* Fondo azul claro al pasar el ratón */
+}
+
+.welcome-text {
+    margin: 0;
+    padding: 0;
+}
+
+/* Dropdown (se muestra al pasar el cursor) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px); /* Se ubica justo debajo del texto */
+    right: 0;
+    background-color: #003f8a;
+    min-width: 150px;
+    border-radius: 0px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 8px 15px; /* Menor padding para compactar */
+    text-decoration: none;
+    display: block;
+    font-size: 0.9rem; /* Compacto */
+}
+
+.dropdown-content a:hover {
+    background-color: #002f6c; /* Azul oscuro */
+}
+
+.user-info:hover .dropdown-content {
+    display: block; /* Mostrar dropdown al pasar el cursor */
+}
+
+/* Ajustar espaciado en la sección de archivo */
+.file-section {
+    display: flex;
+    flex-direction: column;
+    background-color: #f4f4f9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 40px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    gap: 15px;
+}
+
+.file-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #eef5fc;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+.file-header h3 {
+    font-size: 1.5rem;
+    color: #003f8a;
+}
+
+.client-logo {
+    max-width: 120px;
+    max-height: 120px;
+    object-fit: contain;
+    border-radius: 5px;
+    margin-left: 20px;
+}
+
+.file-buttons {
+    display: flex;
+    gap: 10px; /* Espaciado más ajustado entre botones */
+    flex-wrap: wrap; /* Permite que los botones se ajusten si hay poco espacio horizontal */
+    margin: 20px 0;
+    justify-content: flex-start; /* Alinea los botones a la izquierda */
+}
+
+.file-buttons .btn {
+    padding: 10px 20px; /* Aumenta el relleno para un tamaño más atractivo */
+    margin: 5px; /* Agrega espacio entre botones */
+    font-size: 1rem;
+    border-radius: 25px; /* Bordes redondeados para mejor apariencia */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Agrega un leve efecto de elevación */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.file-buttons .btn:hover {
+    transform: scale(1.05); /* Efecto de agrandamiento al pasar el cursor */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.file-buttons .btn-primary {
+    background-color: #0057b8;
+    color: white;
+}
+
+.file-buttons .btn-primary:hover {
+    background-color: #003f8a;
+}
+
+.file-buttons .btn-danger {
+    background-color: #d9534f;
+    color: white;
+}
+
+.file-buttons .btn-danger:hover {
+    background-color: #c9302c;
+}
+
+.file-buttons .btn-success {
+    background-color: #28a745;
+    border-radius: 25px;
+    color: white;
+}
+
+.file-buttons .btn-success:hover {
+    background-color: #218838;
+}
+
+label {
+    background-color: #0057b8;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+label:hover {
+    background-color: #003f8a;
+}
+
+.file-section input[type="file"] {
+    display: none;
+}
+
+/* === Tabla === */
+.table-container {
+    overflow-x: auto; /* Permitir scroll horizontal si el contenido supera el ancho */
+    white-space: nowrap !important; /* Asegura que el contenido fluya correctamente */
+    width: 100% !important; /* Asegurar que la tabla ocupa todo el espacio disponible */
+    display: block; /* Garantiza que el contenedor se comporte como un bloque */
+    max-width: 100%; /* Evitar desbordamientos */
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Agregar sombra */
+    background-color: #fff; /* Fondo blanco */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    word-wrap: break-word; /* Permitir el quiebre de palabras largas */
+    table-layout: auto; /* Ajustar automáticamente las columnas */
+    margin: 10px 0;
+    font-size: 0.9rem;
+    background-color: #f9f9f9;
+    overflow-x: auto;
+}
+
+.styled-table th, .styled-table td {
+    white-space: normal;
+    padding: 08px;
+    min-width: 100px; /* Ancho mínimo de las columnas */
+    max-width: 300px; /* Ancho máximo de las columnas */
+    border: 0px solid #ddd;
+    word-break: break-word; /* Rompe texto largo */
+    vertical-align: top; /* Alinea el texto en la parte superior */
+    text-align: center;
+}
+
+.styled-table th {
+    min-width: 0;
+    max-width: none;
+    width: auto;
+    white-space: normal; /* Permite que el texto se ajuste */
+}
+
+.styled-table th.styled-header {
+    background: linear-gradient(90deg, #002f6c, #0057b8);
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 12px;
+    white-space: nowrap; /* Mantiene el texto en una sola línea */
+    position: relative; /* Fija los encabezados al hacer scroll */
+    top: 0;
+    z-index: 2; /* Asegura que los encabezados estén por encima del contenido */
+    font-size: 0.9rem;
+    border-bottom: 2px solid #ddd;
+    max-width: 150px; /* Establece un ancho máximo */
+    overflow: hidden; /* Oculta cualquier desbordamiento */
+    text-overflow: ellipsis; /* Agrega puntos suspensivos para textos largos */
+}
+
+.styled-table td {
+    text-align: left; /* Alinea el texto a la izquierda */
+    padding: 10px; /* Espaciado interno */
+    border-bottom: 1px solid #ddd; /* Línea separadora entre filas */
+    white-space: normal; /* Permite el ajuste de texto */
+    word-break: break-word; /* Rompe palabras largas */
+}
+
+
+.styled-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.styled-table tr:hover {
+    background-color: #e3f2fd;
+}
+
+.styled-table td:last-child {
+    text-align: center; /* Centrar las acciones */
+}
+
+.table-container {
+    overflow-x: auto; /* Solo agrega desplazamiento si es necesario */
+    max-height: 75vh;
+}
+/* Inputs dentro de la tabla */
+.styled-table input[type="text"] {
+    width: 100%;
+    font-size: 0.85rem;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Botones dentro de la tabla */
+.btn-delete {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background-color: #c9302c;
+}
+
+/* Controles de Datatables */
+.filters-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.styled-table td input {
+    text-align: center; /* Centra el texto dentro de los inputs */
+}
+
+.dataTables_info {
+    padding: 10px;
+    font-size: 0.95rem; /* Ajusta el tamaño de fuente */
+    color: #064b79; /* Cambia el color del texto */
+    font-weight: normal; /* Agrega negrita */
+    margin-top: 10px; /* Añade espacio superior */
+    text-align: center; /* Alinea a la derecha */
+}
+.dataTables_length{
+    padding: 10px;
+    font-size: 1rem; /* Ajusta el tamaño de fuente */
+    color: #064b79; /* Cambia el color del texto */
+    font-weight: normal; /* Agrega negrita */
+    margin-top: 1px; /* Añade espacio superior */
+    text-align: left; /* Alinea a la derecha */
+}
+.filters-container .dataTables_filter input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    background-color: white !important;
+    outline: none;
+}
+
+.filters-container .dataTables_length select:hover {
+    border-color: #0057b8;
+}
+
+.dataTables_filter input:hover,
+.dataTables_filter input:focus {
+    border-color: #0057b8;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .filters-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .table-container {
+        overflow-x: auto; /* Permite desplazamiento horizontal en pantallas pequeñas */
+    }
+
+    .styled-table {
+        font-size: 0.8rem; /* Reduce el tamaño del texto */
+    }
+
+    .styled-table th, .styled-table td {
+        padding: 8px;
+        text-align: center; /* Centrar contenido en pantallas más pequeñas */
+    }
+}
+
+/* Contenedor general para botones del supervisor y exportación */
+.supervisor-actions-container, .export-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Permite que los botones se ajusten */
+    gap: 10px;
+    padding: 15px 0;
+}
+
+
+/* Botones de exportación */
+.export-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end; /* Alinea los botones a la derecha */
+}
+
+/* Botones individuales */
+.export-buttons .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 25px;
+    text-transform: uppercase;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    height: 45px;/* Asegura altura uniforme */
+    min-width: 150px; /* Ancho mínimo consistente */
+    transition: all 0.3s ease;
+}
+
+
+/* Hover para resaltar botones */
+.export-buttons .btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Ajustes específicos por color */
+.export-buttons .btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.export-buttons .btn-success:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.export-buttons .btn-danger {
+    background-color: #d9534f;
+    color: white;
+}
+
+.export-buttons .btn-danger:hover {
+    background-color: #c9302c;
+    transform: scale(1.05);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+/* Botones del supervisor */
+.supervisor-actions .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 25px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+    .supervisor-actions-container {
+        flex-direction: column;/* Cambia la disposición a vertical */
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .export-buttons {
+        justify-content: center; /* Centra los botones en dispositivos pequeños */
+        width: 100%; /* Ocupa todo el ancho */
+    }
+
+    .table-container {
+        overflow-x: auto; /* Habilita scroll horizontal para tablas grandes */
+    }
+}
+
+/* === Botones Personalizados === */
+.btn-success, .btn-warning, .btn-primary, .export-buttons .btn {
+    display: inline-flex; /* Para alineación horizontal y vertical */
+    align-items: center; /* Centra verticalmente el contenido */
+    justify-content: center; /* Centra horizontalmente el contenido */
+    padding: 10px 20px; /* Tamaño uniforme */
+    font-size: 1rem;
+    border-radius: 25px;
+    font-weight: bold;
+    margin: 5px; /* Espaciado uniforme entre botones */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    min-width: 150px; /* Asegura el ancho mínimo */
+    height: 45px; /* Asegura la misma altura */
+    text-align: center;
+}
+
+/* Hover para resaltar botones */
+.btn-success:hover, .btn-warning:hover, .btn-primary:hover, .export-buttons .btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+/* Colores específicos */
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-warning {
+    background-color: #f0ad4e;
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #ec971f;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
